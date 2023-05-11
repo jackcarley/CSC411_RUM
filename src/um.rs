@@ -362,10 +362,11 @@ pub fn handle_input(instructions: Vec<u32>){
     
             if um.registers[b] != 0{
                 //duplicate memory segment at $m[$r[b]]
-                let new_segment = um.memory[um.registers[b] as usize].clone();
+                //let new_segment = um.memory[um.registers[b] as usize].clone();
+                let new_segment = &um.memory[um.registers[b] as usize];
         
                 //replace and abandonds the $m[0] value with the new_segment value
-                um.memory[0] = new_segment;
+                um.memory[0] = (new_segment).to_vec();
             }
             //opcode12(&mut um, b, c);
         }
