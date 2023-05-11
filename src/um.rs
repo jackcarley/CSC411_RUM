@@ -207,16 +207,6 @@ pub fn opcode12(um: &mut VM, b: usize, c: usize){
     }
 }
 
-/// Loads a value
-/// 
-/// # Arguments:
-/// * um: A Virtual Machine object
-/// * rl: The a register
-/// * vl: The value
-pub fn opcode13(um: &mut VM, rl: usize, vl: u32){
-    um.registers[rl] = vl;
-}
-
 /// Handle the input of instructions
 /// Is responsible for determining which instructions to execute
 /// 
@@ -306,7 +296,7 @@ pub fn handle_input(instructions: Vec<u32>){
         if opcode == 13{
             let rl = (rumdis::get(&rumdis::RL, instruction)) as usize;
             let vl = rumdis::get(&rumdis::VL, instruction);
-            opcode13(&mut um, rl, vl);
+            um.registers[rl] = vl;
         }
     }
 }
