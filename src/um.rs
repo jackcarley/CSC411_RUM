@@ -207,6 +207,16 @@ pub fn opcode12(um: &mut VM, b: usize, c: usize){
     }
 }
 
+/// Loads a value
+/// 
+/// # Arguments:
+/// * um: A Virtual Machine object
+/// * rl: The a register
+/// * vl: The value
+pub fn opcode13(um: &mut VM, rl: usize, vl: u32){
+    um.registers[rl] = vl;
+}
+
 /// Handle the input of instructions
 /// Is responsible for determining which instructions to execute
 /// 
@@ -252,51 +262,100 @@ pub fn handle_input(instructions: Vec<u32>){
         let a = (rumdis::get(&rumdis::RA, instruction)) as usize;
         let b = (rumdis::get(&rumdis::RB, instruction)) as usize;
         let c = (rumdis::get(&rumdis::RC, instruction)) as usize;
+        //let rl = (rumdis::get(&rumdis::RL, instruction)) as usize;
+        //let vl = rumdis::get(&rumdis::VL, instruction);
         um.program_counter += 1;
 
         if opcode == 0{
             opcode0(&mut um, a, b, c);
         }
         if opcode == 1{
-            opcode1(&mut um, a, b, c);
+            um.registers[a] = um.memory[um.registers[b] as usize][um.registers[c] as usize];
+            //opcode1(&mut um, a, b, c);
         }
         if opcode == 2{
-            opcode2(&mut um, a, b, c);
+            um.memory[um.registers[a] as usize][um.registers[b] as usize] = um.registers[c];
+            //opcode2(&mut um, a, b, c);
         }
         if opcode == 3{
-            opcode3(&mut um, a, b, c);
+            um.registers[a] = um.registers[b].wrapping_add(um.registers[c]);
+            //opcode3(&mut um, a, b, c);
         }
         if opcode == 4{
-            opcode4(&mut um, a, b, c);
+            um.registers[a] = um.registers[b].wrapping_mul(um.registers[c]);
+            //opcode4(&mut um, a, b, c);
         }
         if opcode == 5{
-            opcode5(&mut um, a, b, c);
+            if um.registers[c] == 0{
+                panic!("Cannot divide by 0")
+            }
+            um.registers[a] = um.registers[b] / um.registers[c];
+            //opcode5(&mut um, a, b, c);
         }
         if opcode == 6{
-            opcode6(&mut um, a, b, c);
+            um.registers[a] = !(um.registers[b] & um.registers[c]);
+            //opcode6(&mut um, a, b, c);
         }
         if opcode == 7{
-            opcode7();
+            std::process::exit(0);
+            //opcode7();
         }
         if opcode == 8{
             opcode8(&mut um, b, c);
         }
         if opcode == 9{
-            opcode9(&mut um, c);
+            if um.registers[c] as usize == 0{
+                panic!("Instruction is trying to unmap $m[0]")
+            }else{
+                um.unmap_index_values.push(um.registers[c] as usize);
+            }
+            //opcode9(&mut um, c);
         }
         if opcode == 10{
-            opcode10(&mut um, c);
+            let value = u8::try_from(um.registers[c]).unwrap();
+            let mut buffer = std::io::stdout();
+            match buffer.write(&[value]).unwrap() {
+                1 =>{
+                    stdout().flush().unwrap();
+                },
+                _ =>{
+                    panic!("Wrong output value")
+                }
+            }
+            //opcode10(&mut um, c);
         }
         if opcode == 11{
-            opcode11(&mut um, c);
+            let mut input = [0_u8; 1];
+
+            let mut number = stdin();
+        
+            um.registers[c] = match number.read(&mut input).expect("Failed to read line") {
+                1 =>{
+                    input[0] as u32
+                },
+                _ => {
+                    u32::MAX
+                }
+            }
+            //opcode11(&mut um, c);
         }
         if opcode == 12{
-            opcode12(&mut um, b, c);
+            um.program_counter = um.registers[c] as usize;
+    
+            if um.registers[b] != 0{
+                //duplicate memory segment at $m[$r[b]]
+                let new_segment = um.memory[um.registers[b] as usize].clone();
+        
+                //replace and abandonds the $m[0] value with the new_segment value
+                um.memory[0] = new_segment;
+            }
+            //opcode12(&mut um, b, c);
         }
         if opcode == 13{
             let rl = (rumdis::get(&rumdis::RL, instruction)) as usize;
             let vl = rumdis::get(&rumdis::VL, instruction);
             um.registers[rl] = vl;
+            //opcode13(&mut um, rl, vl);
         }
     }
 }
