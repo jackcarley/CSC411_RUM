@@ -262,8 +262,6 @@ pub fn handle_input(instructions: Vec<u32>){
         let a = (rumdis::get(&rumdis::RA, instruction)) as usize;
         let b = (rumdis::get(&rumdis::RB, instruction)) as usize;
         let c = (rumdis::get(&rumdis::RC, instruction)) as usize;
-        let rl = (rumdis::get(&rumdis::RL, instruction)) as usize;
-        let vl = rumdis::get(&rumdis::VL, instruction);
         um.program_counter += 1;
 
         if opcode == 0{
@@ -306,6 +304,8 @@ pub fn handle_input(instructions: Vec<u32>){
             opcode12(&mut um, b, c);
         }
         if opcode == 13{
+            let rl = (rumdis::get(&rumdis::RL, instruction)) as usize;
+            let vl = rumdis::get(&rumdis::VL, instruction);
             opcode13(&mut um, rl, vl);
         }
     }
