@@ -226,6 +226,7 @@ pub fn handle_input(instructions: Vec<u32>){
     //initialize registers to 0
     let registers: Vec<u32> = vec![0; 8];
 
+
     //create program counter and initialize to 0,0
     let program_counter = 0;
 
@@ -259,7 +260,7 @@ pub fn handle_input(instructions: Vec<u32>){
 
         //get the opcode
         let opcode = rumdis::get(&rumdis::OP, instruction);
-        let a = (rumdis::get(&rumdis::RA, instruction)) as usize;
+        //let a = (rumdis::get(&rumdis::RA, instruction)) as usize;
         let b = (rumdis::get(&rumdis::RB, instruction)) as usize;
         let c = (rumdis::get(&rumdis::RC, instruction)) as usize;
         //let rl = (rumdis::get(&rumdis::RL, instruction)) as usize;
@@ -267,28 +268,34 @@ pub fn handle_input(instructions: Vec<u32>){
         um.program_counter += 1;
 
         if opcode == 0{
+            let a = (rumdis::get(&rumdis::RA, instruction)) as usize;
             if um.registers[c] != 0{
                 um.registers[a] = um.registers[b];
             }
             //opcode0(&mut um, a, b, c);
         }
         if opcode == 1{
+            let a = (rumdis::get(&rumdis::RA, instruction)) as usize;
             um.registers[a] = um.memory[um.registers[b] as usize][um.registers[c] as usize];
             //opcode1(&mut um, a, b, c);
         }
         if opcode == 2{
+            let a = (rumdis::get(&rumdis::RA, instruction)) as usize;
             um.memory[um.registers[a] as usize][um.registers[b] as usize] = um.registers[c];
             //opcode2(&mut um, a, b, c);
         }
         if opcode == 3{
+            let a = (rumdis::get(&rumdis::RA, instruction)) as usize;
             um.registers[a] = um.registers[b].wrapping_add(um.registers[c]);
             //opcode3(&mut um, a, b, c);
         }
         if opcode == 4{
+            let a = (rumdis::get(&rumdis::RA, instruction)) as usize;
             um.registers[a] = um.registers[b].wrapping_mul(um.registers[c]);
             //opcode4(&mut um, a, b, c);
         }
         if opcode == 5{
+            let a = (rumdis::get(&rumdis::RA, instruction)) as usize;
             if um.registers[c] == 0{
                 panic!("Cannot divide by 0")
             }
@@ -296,6 +303,7 @@ pub fn handle_input(instructions: Vec<u32>){
             //opcode5(&mut um, a, b, c);
         }
         if opcode == 6{
+            let a = (rumdis::get(&rumdis::RA, instruction)) as usize;
             um.registers[a] = !(um.registers[b] & um.registers[c]);
             //opcode6(&mut um, a, b, c);
         }
@@ -304,8 +312,8 @@ pub fn handle_input(instructions: Vec<u32>){
             //opcode7();
         }
         if opcode == 8{
-            let length = um.registers[c] as usize;
-            let new_segment = vec![0_u32; length];
+            //let length = um.registers[c] as usize;
+            let new_segment = vec![0_u32; um.registers[c] as usize];
         
             //A bit pattern that is not all zeroes and does not identify any currently mapped segment is placed in $r[B].
             if um.unmap_index_values.len() != 0{
