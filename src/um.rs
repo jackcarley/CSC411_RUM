@@ -270,6 +270,7 @@ pub fn handle_input(instructions: Vec<u32>){
             if um.registers[c] != 0{
                 um.registers[a] = um.registers[b];
             }
+            //opcode0(&mut um, a, b, c);
         }
         if opcode == 1{
             um.registers[a] = um.memory[um.registers[b] as usize][um.registers[c] as usize];
@@ -314,7 +315,8 @@ pub fn handle_input(instructions: Vec<u32>){
                 um.memory[um.registers[b] as usize] = new_segment;
             }else {
                 //The new segment is mapped as $m[$r[B]].
-                um.memory.push(new_segment.clone());
+                //um.memory.push(new_segment.clone());
+                um.memory.push(new_segment);
                 um.registers[b] = (um.memory.len() - 1) as u32;
             }
             //opcode8(&mut um, b, c);
