@@ -303,7 +303,21 @@ pub fn handle_input(instructions: Vec<u32>){
             //opcode7();
         }
         if opcode == 8{
-            opcode8(&mut um, b, c);
+            let length = um.registers[c] as usize;
+            let new_segment = vec![0_u32; length];
+        
+            //A bit pattern that is not all zeroes and does not identify any currently mapped segment is placed in $r[B].
+            if um.unmap_index_values.len() != 0{
+                um.registers[b] = (um.unmap_index_values.pop().unwrap()) as u32;
+        
+                //The new segment is mapped as $m[$r[B]].
+                um.memory[um.registers[b] as usize] = new_segment;
+            }else {
+                //The new segment is mapped as $m[$r[B]].
+                um.memory.push(new_segment.clone());
+                um.registers[b] = (um.memory.len() - 1) as u32;
+            }
+            //opcode8(&mut um, b, c);
         }
         if opcode == 9{
             if um.registers[c] as usize == 0{
