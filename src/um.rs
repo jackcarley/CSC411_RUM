@@ -267,7 +267,9 @@ pub fn handle_input(instructions: Vec<u32>){
         um.program_counter += 1;
 
         if opcode == 0{
-            opcode0(&mut um, a, b, c);
+            if um.registers[c] != 0{
+                um.registers[a] = um.registers[b];
+            }
         }
         if opcode == 1{
             um.registers[a] = um.memory[um.registers[b] as usize][um.registers[c] as usize];
